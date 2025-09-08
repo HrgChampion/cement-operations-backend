@@ -25,4 +25,3 @@ app.include_router(data_router)
 def home():
     return {"message": "Cement Plant API is running"}
 
-

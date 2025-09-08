@@ -5,13 +5,11 @@ import random
 import asyncio
 from datetime import datetime, timezone
 from typing import Dict
-from concurrent.futures import ThreadPoolExecutor
 
-import psycopg2
-from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from fastapi import APIRouter, WebSocket, Query
 from starlette.websockets import WebSocketDisconnect
+from google.cloud import pubsub_v1
 
 # ----------------------------
 # Router
@@ -22,69 +20,16 @@ router = APIRouter(tags=["Cement Data"])
 # Config
 # ----------------------------
 load_dotenv()
-DB_CONFIG = {
-    "dbname": os.getenv("POSTGRES_DB", "cement_db"),
-    "user": os.getenv("POSTGRES_USER", "postgres"),
-    "password": os.getenv("POSTGRES_PASSWORD", ""),
-    "host": os.getenv("POSTGRES_HOST", "localhost"),
-    "port": os.getenv("POSTGRES_PORT", "5432"),
-}
-DB_EXECUTOR = ThreadPoolExecutor(max_workers=4)
+PROJECT_ID = os.getenv("GCP_PROJECT_ID", "cement-operations-optimization")
+TOPIC_ID = os.getenv("PUBSUB_TOPIC_ID", "cement-raw")
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
-def get_db_connection():
-    return psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
-
-def create_table_sync():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS cement_plant_data (
-        id SERIAL PRIMARY KEY,
-        timestamp TIMESTAMPTZ NOT NULL,
-        equipment TEXT NOT NULL,
-        temperature DOUBLE PRECISION,
-        pressure DOUBLE PRECISION,
-        vibration DOUBLE PRECISION,
-        power DOUBLE PRECISION,
-        emissions DOUBLE PRECISION,
-        fineness DOUBLE PRECISION,
-        residue DOUBLE PRECISION,
-        anomaly BOOLEAN,
-        anomaly_type TEXT
-    );
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-def insert_record_sync(record: Dict):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO cement_plant_data
-        (timestamp, equipment, temperature, pressure, vibration, power,
-         emissions, fineness, residue, anomaly, anomaly_type)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """, (
-        record["timestamp"],
-        record["equipment"],
-        record["metrics"].get("temperature"),
-        record["metrics"].get("pressure"),
-        record["metrics"].get("vibration"),
-        record["metrics"].get("power"),
-        record["metrics"].get("emissions"),
-        record["metrics"].get("fineness"),
-        record["metrics"].get("residue"),
-        record.get("anomaly", False),
-        record.get("anomaly_type"),
-    ))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-async def run_db(fn, *args, **kwargs):
-    loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(DB_EXECUTOR, lambda: fn(*args, **kwargs))
+def publish_to_pubsub(record: Dict):
+    """Publish record to Pub/Sub."""
+    data = json.dumps(record).encode("utf-8")
+    future = publisher.publish(topic_path, data)
+    return future.result()
 
 # ----------------------------
 # Synthetic data generator
@@ -134,7 +79,7 @@ def generate_record():
     equipment = random.choice(EQUIPMENT)
     readings = generate_normal_readings()
     anomaly_flag, anomaly_type = False, None
-    if random.random() < 0.1:
+    if random.random() < 0.1:  # 10% anomaly chance
         anomaly_flag = True
         anomaly_type, readings = inject_anomaly(readings)
     ts = datetime.now(timezone.utc).isoformat()
@@ -149,10 +94,6 @@ def generate_record():
 # ----------------------------
 # Router endpoints
 # ----------------------------
-@router.on_event("startup")
-async def startup_event():
-    await run_db(create_table_sync)
-
 @router.get("/health")
 async def health_check():
     return {"status": "ok", "service": "cement-data"}
@@ -160,14 +101,14 @@ async def health_check():
 @router.get("/latest")
 async def get_latest():
     record = generate_record()
-    await run_db(insert_record_sync, record)
+    publish_to_pubsub(record)
     return record
 
 @router.get("/batch")
 async def get_batch(size: int = Query(10, gt=0, le=1000)):
     records = [generate_record() for _ in range(size)]
     for r in records:
-        await run_db(insert_record_sync, r)
+        publish_to_pubsub(r)
     return records
 
 @router.websocket("/ws/data")
@@ -176,12 +117,8 @@ async def websocket_data(ws: WebSocket):
     try:
         while True:
             record = generate_record()
-            asyncio.create_task(run_db(insert_record_sync, record))
+            publish_to_pubsub(record)
             await ws.send_text(json.dumps(record))
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
     except WebSocketDisconnect:
-        # Client disconnected, just exit the function
-        pass
-    except Exception:
-        # Handle other exceptions if needed
         pass

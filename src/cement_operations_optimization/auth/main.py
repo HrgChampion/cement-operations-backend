@@ -3,16 +3,18 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
 from psycopg2.extras import RealDictCursor
-from ..db import get_db_connection
+from db import get_db_connection
 import os as process
 from dotenv import load_dotenv
-from ..utils.auth import create_access_token
+from utils.auth import create_access_token
 
-from ..models.users import Token, UserCreate, UserOut
+from models.users import Token, UserCreate, UserOut
 
 load_dotenv()
 
 SECRET_KEY = process.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is not set. Please check your .env file.")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

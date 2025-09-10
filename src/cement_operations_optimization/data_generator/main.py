@@ -2,6 +2,7 @@ import base64
 import json
 import os
 from google.cloud import bigquery
+from fastapi import APIRouter
 
 BQ_PROJECT = "cement-operations-optimization"
 BQ_DATASET = os.getenv("BQ_DATASET", "plant")
@@ -9,7 +10,7 @@ BQ_TABLE = os.getenv("BQ_TABLE", "cement_raw")
 
 client = bigquery.Client(project=BQ_PROJECT)
 table_ref = client.dataset(BQ_DATASET).table(BQ_TABLE)
-
+router = APIRouter()
 
 def pubsub_to_bq(event, context):
     """Triggered by Pub/Sub message → Insert into BigQuery."""
@@ -33,3 +34,17 @@ def pubsub_to_bq(event, context):
     errors = client.insert_rows_json(table_ref, [row_to_insert])
     if errors:
         print("BigQuery insert errors:", errors)
+
+
+@router.get("/predictions")
+def get_predictions(limit: int = 50):
+    """Fetch latest anomaly predictions from BigQuery."""
+    query = f"""
+        SELECT *
+        FROM `cement-operations-optimization.plant.cement_predictions`
+        ORDER BY prediction_time DESC
+        LIMIT {limit}
+    """
+    query_job = client.query(query)
+    rows = [dict(row) for row in query_job]
+    return {"predictions": rows}

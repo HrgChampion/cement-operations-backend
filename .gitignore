@@ -5,3 +5,4 @@ __pycache__/
 *.pyo
 *.pyd
 src/cement_operations_optimization/data_generator/key.json
+tmp/

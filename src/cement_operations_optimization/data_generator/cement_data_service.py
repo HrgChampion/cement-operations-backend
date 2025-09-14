@@ -9,6 +9,7 @@ from typing import Dict
 from dotenv import load_dotenv
 from fastapi import APIRouter, WebSocket, Query
 from starlette.websockets import WebSocketDisconnect
+form pubsub_push import connected_websockets
 from google.cloud import pubsub_v1
 
 # ----------------------------
@@ -114,11 +115,15 @@ async def get_batch(size: int = Query(10, gt=0, le=1000)):
 @router.websocket("/ws/data")
 async def websocket_data(ws: WebSocket):
     await ws.accept()
+    connected_websockets.add(ws)
     try:
         while True:
-            record = generate_record()
-            publish_to_pubsub(record)
-            await ws.send_text(json.dumps(record))
-            await asyncio.sleep(2)
-    except WebSocketDisconnect:
+            # optionally send heartbeat or telemetry
+            await asyncio.sleep(60)
+    except Exception:
         pass
+    finally:
+        try:
+            connected_websockets.remove(ws)
+        except Exception:
+            pass

@@ -1,4 +1,3 @@
-# ml/train_xgb.py
 import os
 import pandas as pd
 from google.cloud import bigquery, storage
@@ -95,7 +94,7 @@ def main():
     # Save joblib for local testing
     local_joblib = "tmp/model.joblib"
     joblib.dump(bst, local_joblib)
-    joblib.dump(model, "cement_xgb_model.pkl")
+    joblib.dump(bst, "cement_xgb_model.pkl")
     upload_to_gcs(local_joblib, GCS_BUCKET.replace("gs://",""), MODEL_JOBLIB_PATH)
 
     print("✅ Models saved:")

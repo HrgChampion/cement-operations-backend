@@ -1,22 +1,28 @@
 {
-  "instances": [
-    {
-      "avg_temperature": 145.2,
-      "avg_pressure": 3.4,
-      "avg_vibration": 0.02,
-      "avg_power": 250.5,
-      "avg_emissions": 0.12,
-      "avg_fineness": 320.0,
-      "avg_residue": 15.0,
-      "temp_lag_1h": 144.8,
-      "temp_lag_2h": 144.6,
-      "emissions_lag_1h": 0.13,
-      "emissions_lag_2h": 0.14,
-      "temp_roll_3h": 145.0,
-      "temp_roll_6h": 144.9,
-      "emissions_roll_3h": 0.12,
-      "temp_trend_3h": 0.5,
-      "emissions_trend_3h": -0.01
-    }
+  "instances": [[
+    "avg_temperature", "avg_pressure", "avg_vibration", "avg_power", "avg_emissions",
+    "avg_fineness", "avg_residue",
+    "temp_lag_1h", "temp_lag_2h", "emissions_lag_1h", "emissions_lag_2h",
+    "temp_roll_3h", "temp_roll_6h", "emissions_roll_3h",
+    "temp_trend_3h", "emissions_trend_3h"
+],
+    [
+      145.2,
+      3.4,
+      0.02,
+      250.5,
+      0.12,
+      320.0,
+      15.0,
+      144.8,
+      144.6,
+      0.13,
+      0.14,
+      145.0,
+      144.9,
+      0.12,
+      0.5,
+      -0.01
+    ]
   ]
 }

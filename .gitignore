@@ -6,3 +6,4 @@ __pycache__/
 *.pyd
 src/cement_operations_optimization/data_generator/key.json
 tmp/
+ml_train_deploy/requirements.txt

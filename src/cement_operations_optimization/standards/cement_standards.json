@@ -1,0 +1,36 @@
+[
+    {
+      "cement_type": "OPC43",
+      "standards": {
+        "compressive_strength_28d_MPa": 43.0,
+        "compressive_strength_3d_MPa": 23.0,
+        "fineness_blaine_m2_per_kg": 225.0,
+        "initial_setting_time_min": 30,
+        "final_setting_time_min": 600,
+        "soundness_le_chatelier_max_mm": 10
+      }
+    },
+    {
+      "cement_type": "OPC53",
+      "standards": {
+        "compressive_strength_28d_MPa": 53.0,
+        "compressive_strength_3d_MPa": 27.0,
+        "fineness_blaine_m2_per_kg": 225.0,
+        "initial_setting_time_min": 30,
+        "final_setting_time_min": 600,
+        "soundness_le_chatelier_max_mm": 10
+      }
+    },
+    {
+      "cement_type": "PPC",
+      "standards": {
+        "compressive_strength_28d_MPa": 33.0,
+        "compressive_strength_7d_MPa": 16.0,        
+        "fineness_blaine_m2_per_kg": 320.0,            
+        "initial_setting_time_min": 30,
+        "final_setting_time_min": 600,
+        "soundness_le_chatelier_max_mm": 10
+      }
+    }
+  ]
+  

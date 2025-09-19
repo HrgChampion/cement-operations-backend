@@ -5,6 +5,9 @@ from data_generator.cement_data_service import router as data_router
 import os
 import uvicorn
 from data_generator.main import router as predictions_router
+from utils.alerts_service_async import router as alerts_router
+from trends.trends import trends
+from kpis.kpis import kpis
 
 app = FastAPI(title="Cement Plant AI API")
 
@@ -26,6 +29,9 @@ app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(predictions_router, prefix="/ml", tags=["ML"])
 
 app.include_router(data_router)
+app.include_router(alerts_router)
+app.include_router(trends.router)
+app.include_router(kpis.router) 
 
 @app.get("/")
 def home():

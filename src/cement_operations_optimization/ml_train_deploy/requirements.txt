@@ -20,8 +20,7 @@ scikit-learn>=1.7.2
 xgboost==1.6.0
 joblib>=1.5.2
 pandas>=2.3.2
-db-types>=1.0.0
+db-dtypes
 pyarrow>=21.0.0
 google-cloud-aiplatform
 google-auth
-google-cloud-pubsub[asyncio]

@@ -7,13 +7,13 @@ router = APIRouter(tags=["Trends"])
 bq_client = bigquery.Client()
 
 PROJECT_ID = os.getenv("GCP_PROJECT", "cement-operations-optimization")
-BQ_DATASET = "cement_ai"
+BQ_DATASET = "plant"
 PREDICTIONS_TABLE = "cement_predictions"
 
 @router.get("/trends")
 def get_trends(
     equipment: str = Query(..., description="Equipment name"),
-    hours: int = Query(24, description="Past hours to fetch")
+    hours: int = Query(2, description="Past hours to fetch")
 ):
     query = f"""
         SELECT

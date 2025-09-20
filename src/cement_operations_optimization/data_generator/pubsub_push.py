@@ -7,7 +7,7 @@ import asyncio
 
 router = APIRouter()
 # global set maintained by your websocket endpoint
-connected_websockets = set()  # set of WebSocket objects; ensure you import same object between modules
+connected_websockets = set()
 
 @router.post("/pubsub/push")
 async def pubsub_push(request: Request, x_goog_resource_state: str | None = Header(None)):
@@ -16,7 +16,6 @@ async def pubsub_push(request: Request, x_goog_resource_state: str | None = Head
     No auth validation shown — add verification (JWT signature) in production.
     """
     body = await request.json()
-    # Body structure: {"message": {"data": "...", "attributes": {...}}, "subscription":"..."}
     msg = body.get("message")
     if not msg:
         raise HTTPException(status_code=400, detail="Bad Pub/Sub payload")
@@ -34,6 +33,7 @@ async def pubsub_push(request: Request, x_goog_resource_state: str | None = Head
     return {"status": "ok"}
 
 async def broadcast_to_websockets(payload):
+    print(f"Broadcasting to {len(connected_websockets)} websockets: {payload}")
     dead = []
     for ws in list(connected_websockets):
         try:

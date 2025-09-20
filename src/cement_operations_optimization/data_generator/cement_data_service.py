@@ -79,7 +79,7 @@ def generate_record():
     equipment = random.choice(EQUIPMENT)
     readings = generate_normal_readings()
     anomaly_flag, anomaly_type = False, None
-    if random.random() < 0.1:  # 10% anomaly chance
+    if random.random() < 0.1:
         anomaly_flag = True
         anomaly_type, readings = inject_anomaly(readings)
     ts = datetime.now(timezone.utc).isoformat()
@@ -117,7 +117,9 @@ async def websocket_data(ws: WebSocket):
     connected_websockets.add(ws)
     try:
         while True:
-            await asyncio.sleep(60)
+            record = generate_record()
+            await ws.send_json(record)
+            await asyncio.sleep(2)  # send every 2 seconds
     except Exception:
         pass
     finally:

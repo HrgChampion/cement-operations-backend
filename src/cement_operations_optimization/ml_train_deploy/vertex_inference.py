@@ -8,7 +8,7 @@ from google.cloud import bigquery, pubsub_v1
 PROJECT_ID = os.getenv("GCP_PROJECT")
 LOCATION = os.getenv("VERTEX_LOCATION", "asia-south1")
 ENDPOINT_ID = os.getenv("VERTEX_ENDPOINT_ID","1436749436200943616")
-BQ_DATASET = os.getenv("BQ_DATASET_PRED", "cement_ai")
+BQ_DATASET = os.getenv("BQ_DATASET_PRED", "plant")
 PREDICTIONS_TABLE = os.getenv("PREDICTIONS_TABLE", "cement_predictions")
 ALERTS_TOPIC = os.getenv("ALERTS_TOPIC", "cement-alerts")
 ANOMALY_THRESHOLD = float(os.getenv("ANOMALY_THRESHOLD", "0.5"))

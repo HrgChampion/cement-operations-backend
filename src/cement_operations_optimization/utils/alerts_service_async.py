@@ -5,7 +5,7 @@ from typing import Any
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from google.cloud import pubsub_v1
 from google.cloud.pubsub_v1.subscriber.message import Message
-from realtime_state import connections
+from .realtime_state import connections
 
 router = APIRouter(tags=["Alerts"])
 

@@ -10,7 +10,7 @@ PREDICTIONS_TABLE = "cement_predictions"
 
 bq_client = bigquery.Client()
 
-@router.get("/api/kpis")
+@router.get("/kpis")
 def get_kpis():
     """
     Aggregate key KPIs from BigQuery and return JSON for dashboard

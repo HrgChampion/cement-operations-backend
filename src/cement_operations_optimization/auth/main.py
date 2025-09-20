@@ -3,12 +3,12 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
 from psycopg2.extras import RealDictCursor
-from db import get_db_connection
+from cement_operations_optimization.db import get_db_connection
 import os as process
 from dotenv import load_dotenv
-from utils.auth import create_access_token
+from cement_operations_optimization.utils.auth import create_access_token
 
-from models.users import Token, UserCreate, UserOut
+from cement_operations_optimization.models.users import Token, UserCreate, UserOut
 
 load_dotenv()
 

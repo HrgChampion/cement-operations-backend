@@ -1,4 +1,3 @@
-# cement_data_service.py
 import os
 import json
 import random
@@ -9,7 +8,7 @@ from typing import Dict
 from dotenv import load_dotenv
 from fastapi import APIRouter, WebSocket, Query
 from starlette.websockets import WebSocketDisconnect
-form pubsub_push import connected_websockets
+from cement_operations_optimization.data_generator.pubsub_push import connected_websockets
 from google.cloud import pubsub_v1
 
 # ----------------------------
@@ -118,7 +117,6 @@ async def websocket_data(ws: WebSocket):
     connected_websockets.add(ws)
     try:
         while True:
-            # optionally send heartbeat or telemetry
             await asyncio.sleep(60)
     except Exception:
         pass
